@@ -23,6 +23,8 @@ target/
 .idea/artifacts/**
 .idea/dataSources.local.xml
 .idea/dictionaries/*.xml
+.idea
+exchange.iml
 
 ###############
 ## Various
