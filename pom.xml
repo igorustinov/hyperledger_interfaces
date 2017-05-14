@@ -5,13 +5,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.avrios.sample</groupId>
+    <groupId>com.company.exchange</groupId>
     <artifactId>exchange</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Avrios Foreign Exchange Rate Service</name>
-    <description>Sample project for backend developers</description>
+    <name>Foreign Exchange Rate Service</name>
+    <description>Incredibly awesome caching proxy</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -37,6 +37,8 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+
 
     </dependencies>
 

@@ -1,4 +1,4 @@
-package com.avrios.sample.exchange;
+package com.company.exchange;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

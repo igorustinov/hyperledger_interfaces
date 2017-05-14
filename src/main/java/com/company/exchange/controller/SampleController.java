@@ -1,4 +1,4 @@
-package com.avrios.sample.exchange.controller;
+package com.company.exchange.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
