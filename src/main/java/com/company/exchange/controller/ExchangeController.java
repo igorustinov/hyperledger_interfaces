@@ -1,5 +1,6 @@
 package com.company.exchange.controller;
 
+import com.company.exchange.controller.error.IllegalExchangeArgumentException;
 import com.company.exchange.controller.error.RateNotFoundException;
 import com.company.exchange.model.ExchangeRate;
 import com.company.exchange.services.ExchangeRatesDataStorage;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 import java.util.Optional;
 
@@ -30,6 +33,7 @@ public class ExchangeController {
                                  @PathVariable("currency") String currency) {
 
         final LocalDate reqDate = LocalDate.parse(date);
+        validateDate(reqDate);
         final Currency reqCurrency = Currency.getInstance(currency.toUpperCase());
 
         final Optional<ExchangeRate> exchangeRate = exchangeRatesDataStorage.getStream()
@@ -41,6 +45,18 @@ public class ExchangeController {
             return exchangeRate.get();
         } else {
             throw new RateNotFoundException("Specified rate wasn't found");
+        }
+    }
+
+    private void validateDate(LocalDate reqDate) {
+        final LocalDate now = LocalDate.now();
+        if (reqDate.compareTo(now) > 0) {
+            throw new IllegalExchangeArgumentException("Date is in future");
+        }
+
+        final long daysBetween = ChronoUnit.DAYS.between(reqDate, now);
+        if (daysBetween > 30) {
+            throw new IllegalExchangeArgumentException("Requesting for older than 30 days in the past");
         }
     }
 }

@@ -40,8 +40,6 @@ public class ExchangeControllerTest {
     @Mock
     private ExchangeRatesDataStorage exchangeCacheMock;
 
-    private WebApplicationContext context;
-
     @InjectMocks
     private ExchangeController controller;
 
@@ -67,7 +65,7 @@ public class ExchangeControllerTest {
         verifyNoMoreInteractions(exchangeCacheMock);
     }
 
-    @Test(expected=NestedServletException.class)
+    @Test
     public void get_notFoundDate() throws Exception {
         List<ExchangeRate> rates = new ArrayList<>();
         rates.add(new ExchangeRate(Currency.getInstance("USD"), LocalDate.parse("2017-05-13"), 1.5));
@@ -81,7 +79,35 @@ public class ExchangeControllerTest {
         verifyNoMoreInteractions(exchangeCacheMock);
     }
 
-    @Test(expected=NestedServletException.class)
+    @Test
+    public void get_futureDate() throws Exception {
+        List<ExchangeRate> rates = new ArrayList<>();
+        rates.add(new ExchangeRate(Currency.getInstance("USD"), LocalDate.parse("2017-05-13"), 1.5));
+
+        when(exchangeCacheMock.getStream()).thenReturn(rates.stream());
+
+        mockMvc.perform(get("/exchange/2042-05-14/usd"))
+                .andExpect(status().is4xxClientError());
+
+        verify(exchangeCacheMock, times(0)).getStream();
+        verifyNoMoreInteractions(exchangeCacheMock);
+    }
+
+    @Test
+    public void get_pastDate() throws Exception {
+        List<ExchangeRate> rates = new ArrayList<>();
+        rates.add(new ExchangeRate(Currency.getInstance("USD"), LocalDate.parse("2017-05-13"), 1.5));
+
+        when(exchangeCacheMock.getStream()).thenReturn(rates.stream());
+
+        mockMvc.perform(get("/exchange/2017-01-14/usd"))
+                .andExpect(status().is4xxClientError());
+
+        verify(exchangeCacheMock, times(0)).getStream();
+        verifyNoMoreInteractions(exchangeCacheMock);
+    }
+
+    @Test
     public void get_notFoundCurrency() throws Exception {
         List<ExchangeRate> rates = new ArrayList<>();
         rates.add(new ExchangeRate(Currency.getInstance("GBP"), LocalDate.parse("2017-05-14"), 1.5));
@@ -91,4 +117,27 @@ public class ExchangeControllerTest {
         mockMvc.perform(get("/exchange/2017-05-14/usd"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void get_badUrl1() throws Exception {
+        List<ExchangeRate> rates = new ArrayList<>();
+        rates.add(new ExchangeRate(Currency.getInstance("GBP"), LocalDate.parse("2017-05-14"), 1.5));
+
+        when(exchangeCacheMock.getStream()).thenReturn(rates.stream());
+
+        mockMvc.perform(get("/exchange/2017-05-14"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void get_badUrl2() throws Exception {
+        List<ExchangeRate> rates = new ArrayList<>();
+        rates.add(new ExchangeRate(Currency.getInstance("GBP"), LocalDate.parse("2017-05-14"), 1.5));
+
+        when(exchangeCacheMock.getStream()).thenReturn(rates.stream());
+
+        mockMvc.perform(get("/exchange/whatever"))
+                .andExpect(status().isNotFound());
+    }
+
 }
