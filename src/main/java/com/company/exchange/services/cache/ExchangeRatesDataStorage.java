@@ -14,4 +14,6 @@ public interface ExchangeRatesDataStorage {
     void add(Collection<ExchangeRate> newRates);
 
     void reload(Collection<ExchangeRate> newRates);
+
+    int size();
 }

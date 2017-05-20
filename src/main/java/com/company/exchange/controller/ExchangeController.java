@@ -1,5 +1,6 @@
 package com.company.exchange.controller;
 
+import com.company.exchange.controller.error.CacheNotInitializedException;
 import com.company.exchange.controller.error.IllegalExchangeArgumentException;
 import com.company.exchange.controller.error.RateNotFoundException;
 import com.company.exchange.model.ExchangeRate;
@@ -37,6 +38,8 @@ public class ExchangeController {
                                                @PathVariable("currency") String currency) {
 
         log.debug(String.format("Request[ date: %s, currency: %s]", date, currency));
+        checkCacheState();
+
         final LocalDate reqDate = LocalDate.parse(date);
         validateDate(reqDate);
         final Currency reqCurrency = Currency.getInstance(currency.toUpperCase());
@@ -50,6 +53,13 @@ public class ExchangeController {
         }
     }
 
+    private void checkCacheState() {
+        if (exchangeRatesDataStorage.size() == 0) {
+            log.error("Cache is not initialized");
+            throw new CacheNotInitializedException();
+        }
+    }
+
     private void validateDate(LocalDate reqDate) {
         final LocalDate now = LocalDate.now();
         if (reqDate.compareTo(now) > 0) {
@@ -57,8 +67,8 @@ public class ExchangeController {
         }
 
         final long daysBetween = ChronoUnit.DAYS.between(reqDate, now);
-        if (daysBetween > 30) {
-            throw new IllegalExchangeArgumentException("Requesting for older than 30 days in the past");
+        if (daysBetween > 90) {
+            throw new IllegalExchangeArgumentException("Requesting for older than 90 days in the past");
         }
     }
 }

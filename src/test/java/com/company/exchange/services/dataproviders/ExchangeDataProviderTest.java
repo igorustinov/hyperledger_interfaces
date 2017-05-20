@@ -8,16 +8,14 @@ import java.util.List;
 
 @Ignore
 public class ExchangeDataProviderTest {
+    //basic connectivity tests; shouldn't be run in testsuite
     @Test
     public void retrieveMonthly() throws Exception {
         final List<ExchangeRate> exchangeRates = new ExchangeDataProvider().retrieveMonthly();
-        System.out.println();
     }
 
     @Test
     public void retrieveDaily() throws Exception {
         final List<ExchangeRate> exchangeRates = new ExchangeDataProvider().retrieveDaily();
-        System.out.println();
     }
-
 }

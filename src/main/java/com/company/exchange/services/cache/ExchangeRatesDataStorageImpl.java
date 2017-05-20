@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 @Component
 public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
@@ -27,12 +28,14 @@ public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
         try {
             final Map<Currency, ExchangeRate> currencyExchangeRateMap = cachedRates.get(date);
             if (currencyExchangeRateMap == null) {
+                log.info("Nothing found for date " + date.toString());
                 return Optional.empty();
             }
 
             final ExchangeRate exchangeRate = currencyExchangeRateMap.get(currency);
 
             if (exchangeRate == null) {
+                log.info("Currency not found " + currency.getCurrencyCode());
                 return Optional.empty();
             }
 
@@ -44,7 +47,9 @@ public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
 
     @Override
     public void add(Collection<ExchangeRate> newRates) {
-        log.info("Adding new rates " + newRates);
+        log.info("Adding new rates " + newRates.stream()
+                .map(xr -> xr.toString() + System.getProperty("line.separator"))
+                .collect(Collectors.toList()));
         lock.writeLock().lock();
         try {
             populateRates(newRates);
@@ -56,7 +61,9 @@ public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
 
     @Override
     public void reload(Collection<ExchangeRate> newRates) {
-        log.info("reloading cache. new rates " + newRates);
+        log.info("reloading cache. new rates " + newRates.stream()
+                .map(xr -> xr.toString() + System.getProperty("line.separator"))
+                .collect(Collectors.toList()));
         lock.writeLock().lock();
         try {
             cachedRates.clear();
@@ -64,6 +71,11 @@ public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    @Override
+    public int size() {
+        return this.cachedRates.size();
     }
 
     private void populateRates(Collection<ExchangeRate> newRates) {
