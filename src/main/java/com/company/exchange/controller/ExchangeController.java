@@ -3,7 +3,7 @@ package com.company.exchange.controller;
 import com.company.exchange.controller.error.IllegalExchangeArgumentException;
 import com.company.exchange.controller.error.RateNotFoundException;
 import com.company.exchange.model.ExchangeRate;
-import com.company.exchange.services.ExchangeRatesDataStorage;
+import com.company.exchange.services.cache.ExchangeRatesDataStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.company.exchange.controller;
 
 import com.company.exchange.model.ExchangeRate;
-import com.company.exchange.services.ExchangeRatesDataStorage;
+import com.company.exchange.services.cache.ExchangeRatesDataStorage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
