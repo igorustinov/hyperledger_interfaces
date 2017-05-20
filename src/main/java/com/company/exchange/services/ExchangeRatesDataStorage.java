@@ -2,9 +2,11 @@ package com.company.exchange.services;
 
 import com.company.exchange.model.ExchangeRate;
 
-import java.util.stream.Stream;
+import java.time.LocalDate;
+import java.util.Currency;
+import java.util.Optional;
 
 public interface ExchangeRatesDataStorage {
 
-    Stream<ExchangeRate> getStream();
+    Optional<ExchangeRate> getExchangeRate(LocalDate date, Currency currency);
 }
