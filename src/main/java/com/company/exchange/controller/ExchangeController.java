@@ -29,24 +29,22 @@ public class ExchangeController {
     @Autowired
     private ExchangeRatesDataStorage exchangeRatesDataStorage;
 
+    private DtoFactory dtoFactory = new DtoFactory();
+
     @RequestMapping(value = "/{date}/{currency}", method = GET)
     @ResponseBody
-    ExchangeRate getExchangeRate(@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String date,
-                                 @PathVariable("currency") String currency) {
+    DtoFactory.ExchangeRateDto getExchangeRate(@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String date,
+                                               @PathVariable("currency") String currency) {
 
-        log.debug(String.format("Request[ date: %s, currency: %s", date, currency));
+        log.debug(String.format("Request[ date: %s, currency: %s]", date, currency));
         final LocalDate reqDate = LocalDate.parse(date);
         validateDate(reqDate);
         final Currency reqCurrency = Currency.getInstance(currency.toUpperCase());
 
         final Optional<ExchangeRate> exchangeRate = exchangeRatesDataStorage.getExchangeRate(reqDate, reqCurrency);
-//        final Optional<ExchangeRate> exchangeRate = exchangeRatesDataStorage.getStream()
-//                .filter(xr -> xr.getDate().equals(reqDate))
-//                .filter(xr -> xr.getCurrency().equals(reqCurrency))
-//                .findFirst();
 
         if (exchangeRate.isPresent()) {
-            return exchangeRate.get();
+            return dtoFactory.tranlateToDto(exchangeRate.get());
         } else {
             throw new RateNotFoundException("Specified rate wasn't found");
         }

@@ -36,8 +36,7 @@ public final class ExchangeRate implements Comparable<ExchangeRate> {
         ExchangeRate that = (ExchangeRate) o;
 
         if (Double.compare(that.rate, rate) != 0) return false;
-        if (!currency.equals(that.currency)) return false;
-        return date.equals(that.date);
+        return currency.equals(that.currency) && date.equals(that.date);
     }
 
     @Override
@@ -75,5 +74,11 @@ public final class ExchangeRate implements Comparable<ExchangeRate> {
         assert this.equals(that);
 
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ExchangeRate[date:%s, currency:%s, rate:%s]",
+                this.date, this.currency, this.rate);
     }
 }

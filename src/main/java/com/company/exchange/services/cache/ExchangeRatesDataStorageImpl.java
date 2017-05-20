@@ -1,6 +1,9 @@
 package com.company.exchange.services.cache;
 
 import com.company.exchange.model.ExchangeRate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -8,13 +11,17 @@ import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+@Component
 public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Map<LocalDate, Map<Currency, ExchangeRate>> cachedRates = new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     @Override
     public Optional<ExchangeRate> getExchangeRate(@NotNull LocalDate date, @NotNull Currency currency) {
+        log.debug(String.format("params: [date: %s, currency: %s]", date, currency));
 
         lock.readLock().lock();
         try {
@@ -37,9 +44,11 @@ public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
 
     @Override
     public void add(Collection<ExchangeRate> newRates) {
+        log.info("Adding new rates " + newRates);
         lock.writeLock().lock();
         try {
             populateRates(newRates);
+            log.info("New rates successfully added");
         } finally {
             lock.writeLock().unlock();
         }
@@ -47,6 +56,7 @@ public class ExchangeRatesDataStorageImpl implements ExchangeRatesDataStorage {
 
     @Override
     public void reload(Collection<ExchangeRate> newRates) {
+        log.info("reloading cache. new rates " + newRates);
         lock.writeLock().lock();
         try {
             cachedRates.clear();
