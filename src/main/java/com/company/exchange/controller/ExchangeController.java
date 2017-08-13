@@ -5,6 +5,7 @@ import com.company.exchange.controller.error.IllegalExchangeArgumentException;
 import com.company.exchange.controller.error.RateNotFoundException;
 import com.company.exchange.model.ExchangeRate;
 import com.company.exchange.services.cache.ExchangeRatesDataStorage;
+import com.company.exchange.services.dataproviders.ILedgeDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,53 +23,23 @@ import java.util.Optional;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
-@RequestMapping("/exchange")
+@RequestMapping("/assets")
 public class ExchangeController {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private ExchangeRatesDataStorage exchangeRatesDataStorage;
+    private ILedgeDataProvider dataProvider;
 
     private DtoFactory dtoFactory = new DtoFactory();
 
-    @RequestMapping(value = "/{date}/{currency}", method = GET)
+    @RequestMapping(value = "/{asset}", method = GET)
     @ResponseBody
-    DtoFactory.ExchangeRateDto getExchangeRate(@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String date,
-                                               @PathVariable("currency") String currency) {
+    DtoFactory.ExchangeRateDto getExchangeRate(@PathVariable("asset") String currency) {
 
-        log.debug(String.format("Request[ date: %s, currency: %s]", date, currency));
-        checkCacheState();
+        //todo implement
+        throw new RuntimeException();
 
-        final LocalDate reqDate = LocalDate.parse(date);
-        validateDate(reqDate);
-        final Currency reqCurrency = Currency.getInstance(currency.toUpperCase());
 
-        final Optional<ExchangeRate> exchangeRate = exchangeRatesDataStorage.getExchangeRate(reqDate, reqCurrency);
-
-        if (exchangeRate.isPresent()) {
-            return dtoFactory.tranlateToDto(exchangeRate.get());
-        } else {
-            throw new RateNotFoundException("Specified rate wasn't found");
-        }
-    }
-
-    private void checkCacheState() {
-        if (exchangeRatesDataStorage.size() == 0) {
-            log.error("Cache is not initialized");
-            throw new CacheNotInitializedException();
-        }
-    }
-
-    private void validateDate(LocalDate reqDate) {
-        final LocalDate now = LocalDate.now();
-        if (reqDate.compareTo(now) > 0) {
-            throw new IllegalExchangeArgumentException("Date is in future");
-        }
-
-        final long daysBetween = ChronoUnit.DAYS.between(reqDate, now);
-        if (daysBetween > 90) {
-            throw new IllegalExchangeArgumentException("Requesting for older than 90 days in the past");
-        }
     }
 }
