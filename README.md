@@ -1,1 +1,1 @@
-# exchange_service
+# hyperledger fabric interface
